@@ -1,0 +1,50 @@
+function  [xx,yy,zz]=kongjian_zhengjie(beta1,beta2,beta3,beta4)
+% Parameter setting 
+R=220; % Stationary platform radius
+r=45;% Moving platform radius
+l1=140;% Master arm length
+l2=510;% Driven arm length
+
+alpha1=0; %The Angle between the active arm and the axis
+alpha2=pi/2;
+alpha3=pi;
+alpha4=3*pi/2;
+
+m11=(r-R-l1*cos(beta1))*cos(alpha1);
+m21=(r-R-l1*cos(beta2))*cos(alpha2);
+m31=(r-R-l1*cos(beta3))*cos(alpha3);
+m41=(r-R-l1*cos(beta4))*cos(alpha4);
+
+m12=(r-R-l1*cos(beta1))*sin(alpha1);
+m22=(r-R-l1*cos(beta2))*sin(alpha2);
+m32=(r-R-l1*cos(beta3))*sin(alpha3);
+m42=(r-R-l1*cos(beta4))*sin(alpha4);
+
+m13=l1*sin(beta1);
+m23=l1*sin(beta2);
+m33=l1*sin(beta3);
+m43=l1*sin(beta4);
+
+N1=(m41^2-m31^2)+(m42^2-m32^2)+(m43^2-m33^2);
+N2=(m21^2-m11^2)+(m22^2-m12^2)+(m23^2-m13^2);
+
+M1=((m43-m33)*(m12-m22)-(m23-m13)*(m32-m42))/((m32-m42)*(m21-m11)*(m41-m31)*(m11-m12));
+M2=((m12-m22)*N1-(m32-m42)*N2)/(2*(m21-m11)*(m32-m42)-2*(m41-m31)*(m12-m22));
+M3=((m43-m33)*(m21-m11)-(m23-m13)*(m31-m41))/((m22-m12)*(m21-m41)-(m42-m32)*(m21-m11));
+M4=((m21-m11)*N1-(m31-m41)*N2)/(2*(m22-m12)*(m21-m41)-2*(m42-m32)*(m21-m11));
+
+w1=M1^2+M3^2+1;
+w2=M1*M2+M3*M4+m11*M1+m12*M3+m13;
+w3=M2^2+M4^2+2*m11*M2+2*m12*M4+m11^2+m12^2+m13^2-l2^2;
+
+
+if w2^2-w1*w3>0 % Select feasible solution
+zz=(-w2-sqrt(w2^2-w1*w3))/w1;
+xx=M1*zz+M2;
+yy=M3*zz+M4;
+else
+    zz=[];
+    xx=[];
+    yy=[];   
+end
+end
